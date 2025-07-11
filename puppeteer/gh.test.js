@@ -1,3 +1,9 @@
+async function checkTitleContains(page, url, expected) {
+  await page.goto(url);
+  const actualTitle = await page.title();
+  expect(actualTitle).toContain(expected);
+}
+
 let page;
 
 beforeEach(async () => {
@@ -12,13 +18,17 @@ describe("Github page tests", () => {
   beforeEach(async () => {
     await page.goto("https://github.com/team");
   });
+
   test("The h1 header content", async () => {
     const firstLink = await page.$("header div div a");
     await firstLink.click();
+    await page.waitForNavigation({
+      waitUntil: 'load'
+    });
     await page.waitForSelector('h1');
     const title2 = await page.title();
     expect(title2).toEqual('GitHub · Build and ship software on a single, collaborative platform · GitHub');
-  }, 41000);
+  }, 15000);
 
   test("The first link attribute", async () => {
     const actual = await page.$eval("a", link => link.getAttribute('href'));
@@ -35,24 +45,14 @@ describe("Github page tests", () => {
   }, 10000);
 });
 
-
 test("Contents of title of page copilot", async () => {
-  await page.goto("https://github.com/features/copilot");
-  const expected = "Your AI pair programmer";
-  const title = await page.title();
-  expect(title).toContain(expected);
+  await checkTitleContains(page, "https://github.com/features/copilot", "Your AI pair programmer");
 }, 9000);
 
 test("Contents of title of page pricing", async () => {
-  await page.goto("https://github.com/pricing");
-  const expected = "Plans for every developer";
-  const title = await page.title();
-  expect(title).toContain(expected);
+  await checkTitleContains(page, "https://github.com/pricing", "Plans for every developer");
 }, 10000);
 
 test("Contents of title of page models", async () => {
-  await page.goto("https://github.com/features/models");
-  const expected = "Build AI-powered projects with industry-leading";
-  const title = await page.title();
-  expect(title).toContain(expected);
+  await checkTitleContains(page, "https://github.com/features/models", "Build AI-powered projects with industry-leading");
 }, 8000);
